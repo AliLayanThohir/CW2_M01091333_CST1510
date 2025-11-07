@@ -191,15 +191,8 @@ while True:
         #If user wants to register a new account
         elif choice == 1:       
             #.strip() is used to remove any leading or trailing spaces or new line characters
+            #Username
             username = input("Please enter your username: ").strip()
-            password = input("Please enter a password: ").strip()
-            group = int(input("1. Cybersecurity Analysts\n2. Data Scientists\n3. IT Administrators\nPlease enter what group you belong to: "))
-            
-            #If user enters an invalid group number
-            if group <1 or group >3:
-                print("The input you have entered is not among the options. Please enter only 1, 2 or 3.")      
-                continue
-                
             #Validation check for username using predefined function
             valid_user, msg = validate_user(username)
             #If username is invalid, restarts loop
@@ -207,13 +200,14 @@ while True:
                 print(msg)
                 continue 
             
+            #Password
+            password = input("Please enter a password: ").strip() 
             #Validation check for password using predefined function
             valid_pass, msg = validate_pass(password)
             #If password is invalid, restarts loop
             if not valid_pass:
                 print(msg)
                 continue
-            
             #Password strength check using predefined function
             strength = check_password_strength(password)
             #If password strength is not strong, restarts loop 
@@ -226,6 +220,14 @@ while True:
                       - A digit
                       - A special character like '!','@','#',etc...''')
                 continue 
+            
+            #Group to be assigned to
+            group = int(input("1. Cybersecurity Analysts\n2. Data Scientists\n3. IT Administrators\nPlease enter what group you belong to: "))
+            
+            #If user enters an invalid group number
+            if group <1 or group >3:
+                print("The input you have entered is not among the options. Please enter only 1, 2 or 3.")      
+                continue
             
             #If all validations are passed, registers user and prints confirmation
             result = register(username,password,group)

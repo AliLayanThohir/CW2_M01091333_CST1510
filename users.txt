@@ -1,3 +1,1 @@
-Layan,$2b$12$qY4DtAbeeL34dH3TLh0Y1ewf7GK5KfZfhtmPT.DXVuhWR.nzcLoKW,Cybersecurity Analyst
-Ali,$2b$12$TC591qITyyij8mf2tfySo../sQhAYnW5MOsATddKej6YTgK94acUC,Data Scientist
-Thohir,$2b$12$FdzhJ5z6W0R.Sg4xrTITn.xJCKb9It1aP5bLhYLPMtlJKC4FXQd4O,IT Administrator
+Nova,$2b$12$nswtcg5XToEGm0iQEQw4JucrgCdnCFqRwYXsCJ5lJvqDi/7nXEUZO,Cybersecurity Analyst

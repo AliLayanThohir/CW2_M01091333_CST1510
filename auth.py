@@ -258,13 +258,10 @@ def reset_lockout(username):
                 file.write(line)
                 
 #Input from user for menu task as a loop until either valid input is given or user exits. 
+print('Welcome to the Multi-Domain Intelligence Platform')
 while True:
     #Menu/Start-up display for registration/login
-    print("""
-    Welcome to the Multi-Domain Intelligence Platform:
-    Please select an option from the following:
-    1. Register as a new user
-    2. Login as an existing user""")
+    print("Please select an option from the following:\n\t1. Register as a new user\n\t2. Login as an existing user")
     try:
         #Input for choice of task
         choice = int(input("Please enter 1 or 2 (enter 0 to exit): "))

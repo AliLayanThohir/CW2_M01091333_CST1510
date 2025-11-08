@@ -7,11 +7,12 @@ import bcrypt
 import os
 import secrets
 import string
-from datetime import datetime
+from datetime import datetime,timedelta
 
 #Text file to store user and session data
 USER_DATA_FILE = "users.txt"
 SESSION_DATA_FILE = "sessions.txt"
+LOCKOUT_FILE = "lockout.txt"
 
 #Function to check password strength
 def check_password_strength(password):
@@ -115,6 +116,12 @@ def verify_pass(stored,provided):
 
 #Function to login a user
 def login(username,password):
+    
+    #Check if user is locked out, if they are, print statement, if not, nothing happens
+    if check_lockout(username):
+        return "Your account '{user}' is locked, please try to login 5 minutes after you have been locked out."
+    
+    
     #Opens text file to read hashed password and verify input password    
     with open("users.txt","r") as file: 
         #Reads each line in file
@@ -128,12 +135,16 @@ def login(username,password):
                 if user == username:
                     #Verifying password using premade function
                     check = verify_pass(hash_pass,password)
-                    #If password is the same, creates session token
+                    #If password is the same, creates session token and print statement that they are logged in
                     if check == True:
+                        #In the case that the user got the password right, resets the lockout just incase they got it wrong once
+                        reset_lockout(username)
                         token, timestamp = create_token(username)
                         return f'Successfully logged in {username}, your session token is: {token} at {timestamp}'
                     #If password in incorrect
                     else:
+                        #Record the failed login attempt 
+                        record_attempt(username)
                         return "Incorrect password, please try again."
 
 #Function to validate username
@@ -167,6 +178,72 @@ def create_token(username):
     #Returns the token number after function is called
     return token, curtime
 
+#Function to check if a user is currently in lockout
+def check_lockout(username):
+    #To handle case where lockout.txt file does not exist yet so loop does not break automatically / end abruptly
+    try:
+        #Opens lockout.txt file to read
+        with open("lockout.txt","r") as file:
+            #Goes line by line in file
+            for line in file:
+                #Get's information from the line and assigns it to these 3 variables
+                user, attempts, latest_time = line.strip().split(",")
+                #If the username is in fact in that line and the failed attempts is equal to 3
+                if user == username and int(attempts) >= 3:
+                    #Format to be used for later calculation
+                    latest_time = datetime.strptime(latest_time, "%Y-%m-%d %H:%M:%S")
+                    #Checks if it's less than 5 minutes since lockout
+                    if datetime.now() - latest_time < timedelta(minutes = 5):
+                        return True
+    #In the case that file does not exist yet, skip and return "False"
+    except FileNotFoundError:
+        pass
+    return False
+
+#Function to record failed attempts
+def record_attempt(username):
+    #Dictionary to keep record of failed attempts, key being username, value being the attempt number
+    data = {}
+    #In the case lockout.txt doesn't exist yet
+    try:
+        #Opens file, reads it line by line, if it exists assigns information to variables
+        with open("lockout.txt","r") as file:
+            for line in file:
+                user, attempts, latest_time = line.strip().split(",")
+                #Stores the user data and the attempts along with the attempt time in dictionary
+                data[user] = [int(attempts), latest_time]
+    #If file isn't created yet, skips so 
+    except FileNotFoundError:
+        pass
+    
+    #If the username is in the data dictionary already, increments attempts 
+    if username in data:
+        data[username][0] += 1
+    #If username is not in the login, add user to data and set attempts to 1 and stores timestamp
+    else: 
+        data[username] = [1, datetime.now().strftime("%Y-%m-%d %H:%M:%S")]
+
+    #Updates data into file / creates file if it doesn't exist and stores first user's data in it
+    with open("lockout.txt","w") as file:
+        for user, (attempts, latest_time) in data.items():
+            file.write(f'{user},{attempts},{latest_time}\n')
+
+#Function to reset lockout
+def reset_lockout(username):
+    #List to store lines from file
+    lines = []
+    #Opens textfile and adds lines to list
+    with open("lockout.txt","r") as file:
+        lines = file.readlines() 
+        
+    with open("lockout.txt","w") as file:
+        #For each line in the list
+        for line in lines:
+            #If the user is in this line, skips this line
+            if not line.startswith(username + ","):
+                #Rewriting the file without the user who's no longer locked out
+                file.write(line)
+                
 #Input from user for menu task as a loop until either valid input is given or user exits. 
 while True:
     #Menu/Start-up display for registration/login

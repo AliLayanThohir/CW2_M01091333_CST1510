@@ -119,8 +119,7 @@ def login(username,password):
     
     #Check if user is locked out, if they are, print statement, if not, nothing happens
     if check_lockout(username):
-        return "Your account '{user}' is locked, please try to login 5 minutes after you have been locked out."
-    
+        return f"Your account '{user}' is locked, please try to login 5 minutes after you have been locked out."
     
     #Opens text file to read hashed password and verify input password    
     with open("users.txt","r") as file: 
@@ -145,6 +144,15 @@ def login(username,password):
                     else:
                         #Record the failed login attempt 
                         record_attempt(username)
+                        
+                        #If user reaches 3rd failed attempt
+                        with open("lockout.txt", "r") as file:
+                            #Goes through the file line by line then assigns values in line to variables
+                            for line in file:
+                                user, attempts, last_time = line.strip().split(",")
+                                #If the condition has been met, otherwise ignores and just goes to return incorrect password
+                                if user == username and int(attempts) == 3:
+                                    return f"User - {user} is now locked out due to three failed attempts.\nPlease try again after 5 minutes."
                         return "Incorrect password, please try again."
 
 #Function to validate username
@@ -195,6 +203,10 @@ def check_lockout(username):
                     #Checks if it's less than 5 minutes since lockout
                     if datetime.now() - latest_time < timedelta(minutes = 5):
                         return True
+                    #If it has beeen 5 minutes or more, resets lockout
+                    else: 
+                        reset_lockout(username)
+                        return False
     #In the case that file does not exist yet, skip and return "False"
     except FileNotFoundError:
         pass
@@ -216,9 +228,10 @@ def record_attempt(username):
     except FileNotFoundError:
         pass
     
-    #If the username is in the data dictionary already, increments attempts 
+    #If the username is in the data dictionary already, increments attempts and updates timestamp
     if username in data:
         data[username][0] += 1
+        data[username][1] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     #If username is not in the login, add user to data and set attempts to 1 and stores timestamp
     else: 
         data[username] = [1, datetime.now().strftime("%Y-%m-%d %H:%M:%S")]

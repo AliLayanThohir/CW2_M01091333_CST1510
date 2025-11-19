@@ -23,3 +23,10 @@ This project migrates the functions from Week 7's file-based sytem to a persiste
     - it_tickets: Logs and stores IT support tickets, their priority and it's status.
     - sessions: Stores active user login tokens 
     - lockout: Tracks failed login attempts in order to lock accounts.
+
+Picture of output of main.py:
+<img width="1508" height="1285" alt="image" src="https://github.com/user-attachments/assets/c6de666a-13a3-412c-a081-6ef2de31e781" />
+<img width="1712" height="1217" alt="image" src="https://github.com/user-attachments/assets/313acafe-03ee-4eae-a697-f365ac161b35" />
+<img width="1672" height="424" alt="image" src="https://github.com/user-attachments/assets/bb1736d1-681b-40d7-9573-5509adcdf096" />
+
+
